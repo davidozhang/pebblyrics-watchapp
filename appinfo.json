@@ -1,0 +1,28 @@
+{
+    "appKeys": {
+        "artist": 0,
+        "lyrics": 2,
+        "track": 1
+    },
+    "capabilities": [
+        ""
+    ],
+    "companyName": "davzee@hotmail.com",
+    "longName": "Pebblyrics",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "Pebblyrics",
+    "targetPlatforms": [
+        "aplite",
+        "basalt",
+        "chalk"
+    ],
+    "uuid": "4296827b-6d2d-42ff-baa0-7bd34eeeec5f",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
