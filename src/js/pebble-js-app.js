@@ -3,13 +3,13 @@ function sendMessage(response) {
     if (content.data) {
         var lyrics = content.data.lyrics;
         // console.log(lyrics);
-        Pebble.sendAppMessage({2: lyrics}, function(e) {
+        Pebble.sendAppMessage({'lyrics': lyrics}, function(e) {
             console.log('Successfully sent lyrics');
         }, function(e) {
-            console.log('Unable to send lyrics, Error is: ' + e.error.message);
+            console.log('Unable to send lyrics, Error is: ' + e.error);
         });
     } else {
-        Pebble.sendAppMessage({2: 'No lyrics found'});
+        Pebble.sendAppMessage({'lyrics': 'No lyrics found'});
     }
 }
 

@@ -51,9 +51,11 @@ void init(void) {
     GRect bounds = layer_get_bounds(layer);
     
     text_layer = text_layer_create(bounds);
-	text_layer_set_text(text_layer, "Pebblyrics");
+	text_layer_set_text(text_layer, "Pebblyrics\n\nWaiting for phone..");
+    text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28));
     text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
     layer_add_child(layer, text_layer_get_layer(text_layer));
+
 	// Register AppMessage handlers
 	app_message_register_inbox_received(inbox_received_callback); 
 	app_message_register_inbox_dropped(inbox_dropped_callback); 
