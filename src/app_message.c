@@ -1,23 +1,23 @@
 #include <pebble.h>
 
-static Window* window;	
+static Window* window;  
 static TextLayer* text_layer;
 
 enum {
-	ARTIST_KEY = 0,	
-	TRACK_KEY = 1,
+    ARTIST_KEY = 0, 
+    TRACK_KEY = 1,
     LYRICS_KEY = 2
 };
 
 void send_message(DictionaryIterator* iterator){
     Tuple* artist = dict_find(iterator, ARTIST_KEY);
     Tuple* track = dict_find(iterator, TRACK_KEY);
-	app_message_outbox_begin(&iterator);
-	dict_write_cstring(iterator, ARTIST_KEY, artist->value->cstring);
+    app_message_outbox_begin(&iterator);
+    dict_write_cstring(iterator, ARTIST_KEY, artist->value->cstring);
     dict_write_cstring(iterator, TRACK_KEY, track->value->cstring);
-	
-	dict_write_end(iterator);
-  	app_message_outbox_send();
+
+    dict_write_end(iterator);
+    app_message_outbox_send();
 }
 
 static void inbox_received_callback(DictionaryIterator* iterator, void* context) {
@@ -45,34 +45,34 @@ static void outbox_sent_callback(DictionaryIterator* iterator, void *context) {
 
 void init(void) {
     window = window_create();
-	window_stack_push(window, true);
-    
+    window_stack_push(window, true);
+
     Layer* layer = window_get_root_layer(window);
     GRect bounds = layer_get_bounds(layer);
-    
+
     text_layer = text_layer_create(bounds);
-	text_layer_set_text(text_layer, "Pebblyrics\n\nWaiting for phone..");
+    text_layer_set_text(text_layer, "Pebblyrics\n\nWaiting for phone..");
     text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28));
     text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
     layer_add_child(layer, text_layer_get_layer(text_layer));
 
-	// Register AppMessage handlers
-	app_message_register_inbox_received(inbox_received_callback); 
-	app_message_register_inbox_dropped(inbox_dropped_callback); 
-	app_message_register_outbox_failed(outbox_failed_callback);
+    // Register AppMessage handlers
+    app_message_register_inbox_received(inbox_received_callback); 
+    app_message_register_inbox_dropped(inbox_dropped_callback); 
+    app_message_register_outbox_failed(outbox_failed_callback);
     app_message_register_outbox_sent(outbox_sent_callback);
-		
-	app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
+
+    app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
 }
 
 void deinit(void) {
-	app_message_deregister_callbacks();
+    app_message_deregister_callbacks();
     text_layer_destroy(text_layer);
-	window_destroy(window);
+    window_destroy(window);
 }
 
 int main(void) {
-	init();
-	app_event_loop();
-	deinit();
+    init();
+    app_event_loop();
+    deinit();
 }
