@@ -1,7 +1,10 @@
 #include <pebble.h>
 
+Layer* layer;
+GRect bounds;
 static Window* window;  
 static TextLayer* text_layer;
+static ScrollLayer* scroll_layer;
 
 enum {
     ARTIST_KEY = 0, 
@@ -24,8 +27,27 @@ static void inbox_received_callback(DictionaryIterator* iterator, void* context)
     APP_LOG(APP_LOG_LEVEL_INFO, "Message received!");
     Tuple* lyrics = dict_find(iterator, LYRICS_KEY);
     if (dict_find(iterator, LYRICS_KEY)) {
+        scroll_layer = scroll_layer_create(bounds);
+        scroll_layer_set_click_config_onto_window(scroll_layer, window);
+
+        #ifdef PBL_ROUND
+            scroll_layer_set_paging(scroll_layer, true);
+        #endif
+    
         text_layer_set_text(text_layer, lyrics->value->cstring);
-        text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
+        scroll_layer_add_child(scroll_layer, text_layer_get_layer(text_layer));
+        layer_add_child(layer, scroll_layer_get_layer(scroll_layer));
+
+        #ifdef PBL_ROUND
+          text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
+          uint8_t inset = 4;
+          text_layer_enable_screen_text_flow_and_paging(text_layer, inset);
+        #endif
+        
+        GRect bounds = layer_get_frame(layer);
+        GSize max_size = text_layer_get_content_size(text_layer);
+        text_layer_set_size(text_layer, max_size);
+        scroll_layer_set_content_size(scroll_layer, GSize(bounds.size.w, max_size.h + 4));
     } else {    // redirect the iterator to JS app instead
       send_message(iterator);
     }
@@ -47,16 +69,16 @@ void init(void) {
     window = window_create();
     window_stack_push(window, true);
 
-    Layer* layer = window_get_root_layer(window);
-    GRect bounds = layer_get_bounds(layer);
-
-    text_layer = text_layer_create(bounds);
+    layer = window_get_root_layer(window);
+    bounds = layer_get_frame(layer);
+    GRect max_text_bounds = GRect(0, 0, bounds.size.w, 2000);
+    
+    text_layer = text_layer_create(max_text_bounds);
     text_layer_set_text(text_layer, "Pebblyrics\n\nWaiting for phone..");
     text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28));
     text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
     layer_add_child(layer, text_layer_get_layer(text_layer));
 
-    // Register AppMessage handlers
     app_message_register_inbox_received(inbox_received_callback); 
     app_message_register_inbox_dropped(inbox_dropped_callback); 
     app_message_register_outbox_failed(outbox_failed_callback);
@@ -68,6 +90,7 @@ void init(void) {
 void deinit(void) {
     app_message_deregister_callbacks();
     text_layer_destroy(text_layer);
+    scroll_layer_destroy(scroll_layer);
     window_destroy(window);
 }
 
